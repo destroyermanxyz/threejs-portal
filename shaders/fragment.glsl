@@ -13,6 +13,10 @@ void main() {
 
     gl_FragColor = text;
 
-	// color space
-	gl_FragColor =  sRGBTransferOETF( gl_FragColor );
+	// tone mapping from outputpass
+    gl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );
+
+	// srgb convertion from outputpass
+	gl_FragColor = sRGBTransferOETF( gl_FragColor );
+
 }
