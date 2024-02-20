@@ -147,6 +147,7 @@ class Experience {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderTarget.setSize(window.innerWidth, window.innerHeight);
     }
 
     setRenderer() {
@@ -156,12 +157,15 @@ class Experience {
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1;
 
         this.renderTarget = new THREE.WebGLRenderTarget(
             window.innerWidth,
             window.innerHeight,
-            { samples: 3 }
+            {
+                samples: 3,
+            }
         );
     }
 
@@ -191,7 +195,6 @@ class Experience {
 
         this.renderer.setRenderTarget(this.renderTarget);
         this.renderer.render(this.scene2, this.camera);
-
         this.portal.material.uniforms.tDiffuse.value =
             this.renderTarget.texture;
         this.renderer.setRenderTarget(null);
