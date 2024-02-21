@@ -7,6 +7,9 @@ import Stats from "./Stats";
 import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
 import projectState from "./projectState.json";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 class Experience {
     constructor(canvas) {
@@ -15,13 +18,14 @@ class Experience {
         this.canvas = canvas;
 
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color("#b5e48c");
+        this.scene.background = new THREE.Color("#75D963");
         this.scene2 = new THREE.Scene();
-        this.scene2.background = new THREE.Color("lightblue");
+        this.scene2.background = new THREE.Color("#75CAFF");
 
         this.setRenderer();
         this.setMesh();
         this.setCamera();
+        this.setPostPro();
         this.setLights();
         this.setEvents();
         this.setDebug();
@@ -50,6 +54,16 @@ class Experience {
         );
 
         this.scene.add(this.sphere);
+
+        this.sphereBG = new THREE.Mesh(
+            new THREE.SphereGeometry(20, 64, 64),
+            new THREE.MeshBasicMaterial({
+                color: "#b5e48c",
+                side: THREE.BackSide,
+            })
+        );
+
+        // this.scene.add(this.sphereBG);
 
         /**
          * Portal
@@ -169,6 +183,19 @@ class Experience {
         );
     }
 
+    setPostPro() {
+        const rt = new THREE.WebGLRenderTarget(
+            window.innerWidth,
+            window.innerHeight,
+            { samples: 3 }
+        );
+        this.composer = new EffectComposer(this.renderer, rt);
+        this.renderPass = new RenderPass(this.scene, this.camera);
+        this.composer.addPass(this.renderPass);
+        const outputPass = new OutputPass();
+        this.composer.addPass(outputPass);
+    }
+
     setTick() {
         /**
          * Stats
@@ -200,10 +227,11 @@ class Experience {
         this.renderer.setRenderTarget(null);
 
         if (this.camera.position.z < -3.5) {
-            this.renderer.render(this.scene2, this.camera);
+            this.renderPass.scene = this.scene2;
         } else {
-            this.renderer.render(this.scene, this.camera);
+            this.renderPass.scene = this.scene;
         }
+        this.composer.render();
 
         this.sphere.position.set(0, 0, this.camera.position.z - 8);
         this.sphere2.position.set(0, 0, this.camera.position.z - 8);

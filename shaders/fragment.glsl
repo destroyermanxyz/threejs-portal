@@ -14,9 +14,9 @@ void main() {
     gl_FragColor = text;
 
 	// tone mapping from outputpass
-    gl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );
+    // gl_FragColor.rgb = ACESFilmicToneMsapping( gl_FragColor.rgb );
 
 	// srgb convertion from outputpass
-	gl_FragColor = sRGBTransferOETF( gl_FragColor );
+	// gl_FragColor = sRGBTransferOETF( gl_FragColor );
 
 }
